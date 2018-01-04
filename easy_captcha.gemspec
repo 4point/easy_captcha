@@ -32,10 +32,6 @@ Gem::Specification.new do |s|
   s.add_dependency('rspec-rails', [">= 2.8.1"])
   s.add_dependency('yard', [">= 0.7.0"])
 
-  if defined?(PLATFORM) && PLATFORM == 'java'
-    s.add_runtime_dependency('rmagick4j','>= 0.3.7')
-  else
-    s.add_runtime_dependency('rmagick','>= 2.13.1')
-  end
+  s.add_runtime_dependency('mini_magick','~> 4.8.0')
 end
 
