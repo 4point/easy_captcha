@@ -1,5 +1,7 @@
 # encoding: utf-8
 
+require 'mini_magick'
+
 module EasyCaptcha
   module Generator
 
@@ -58,19 +60,17 @@ module EasyCaptcha
 
       # generate image
       def generate(code)
-        require 'mini_magick' unless defined?(Magick)
-
         config = self
-        canvas = Magick::Image.new(EasyCaptcha.image_width, EasyCaptcha.image_height) do |variable|
-          self.background_color = config.image_background_color unless config.image_background_color.nil?
-          self.background_color = 'none' if config.background_image.present?
+        canvas = MiniMagick::Image.new(EasyCaptcha.image_width, EasyCaptcha.image_height) do |variable|
+          #self.background_color = config.image_background_color unless config.image_background_color.nil?
+          #self.background_color = 'none' if config.background_image.present?
         end
 
         # Render the text in the image
-        canvas.annotate(Magick::Draw.new, 0, 0, 0, 0, code) {
-          self.gravity     = Magick::CenterGravity
+        canvas.annotate(MiniMagick::Draw.new, 0, 0, 0, 0, code) {
+          self.gravity     = MiniMagick::CenterGravity
           self.font        = config.font
-          self.font_weight = Magick::LighterWeight
+          self.font_weight = MiniMagick::LighterWeight
           self.fill        = config.font_fill_color
           if config.font_stroke.to_i > 0
             self.stroke       = config.font_stroke_color
@@ -94,13 +94,13 @@ module EasyCaptcha
         canvas = canvas.implode(config.implode.to_f) if config.implode.is_a? Float
 
         # Crop image because to big after waveing
-        canvas = canvas.crop(Magick::CenterGravity, EasyCaptcha.image_width, EasyCaptcha.image_height)
+        canvas = canvas.crop(MiniMagick::CenterGravity, EasyCaptcha.image_width, EasyCaptcha.image_height)
 
 
         # Combine images if background image is present
         if config.background_image.present?
-          background = Magick::Image.read(config.background_image).first
-          background.composite!(canvas, Magick::CenterGravity, Magick::OverCompositeOp)
+          background = MiniMagick::Image.read(config.background_image).first
+          background.composite!(canvas, MiniMagick::CenterGravity, MiniMagick::OverCompositeOp)
 
           image = background.to_blob { self.format = 'PNG' }
         else
